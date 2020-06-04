@@ -40,7 +40,8 @@ enum planck_layers {
 enum planck_keycodes {
   QWERTY = SAFE_RANGE,
   PLOVER,
-  EXT_PLV
+  EXT_PLV,
+  MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD
 };
 
 #define LOWER MO(_LOWER)
@@ -56,15 +57,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |   /  |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | Brite| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | Left | Down |  Up  |Right |
+ * | GUI  | Ctrl | Alt  |  OS  |Lower |    Space    |Raise |  OS  | Alt  | Ctrl |PrtScr|
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_planck_grid(
     KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
     LCTL_T(KC_ESC),  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, RCTL_T(KC_QUOT),
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_ENT),
-    MO(_GUI), KC_LCTL, KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   RGUI_T(KC_LEFT), KC_DOWN, KC_UP,   KC_RGHT
-),
+    MO(_GUI), KC_LCTL, KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_RALT, KC_RCTL, MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD),
 
 /* Lower
  * ,-----------------------------------------------------------------------------------.
@@ -205,6 +205,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         layer_off(_PLOVER);
       }
       return false;
+      break;
+    case MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD:
+      if (record->event.pressed) {
+        SEND_STRING(SS_LGUI(SS_LCTL(SS_LSFT("4"))));
+      }
       break;
   }
   return true;
