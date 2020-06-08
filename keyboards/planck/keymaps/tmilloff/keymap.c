@@ -41,7 +41,10 @@ enum planck_keycodes {
   QWERTY = SAFE_RANGE,
   PLOVER,
   EXT_PLV,
-  MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD
+  MAC_CAPTURE_SCREEN,
+  MAC_CAPTURE_PORTION,
+  MAC_COPY_SCREEN,
+  MAC_COPY_PORTION
 };
 
 #define LOWER MO(_LOWER)
@@ -57,14 +60,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |   /  |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | GUI  | Ctrl | Alt  |  OS  |Lower |    Space    |Raise |  OS  | Alt  | Ctrl |PrtScr|
+ * | GUI  | Ctrl | Alt  |  OS  |Lower |    Space    |Raise |  OS  | Alt  | Ctrl | GUI  |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_planck_grid(
     KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
     LCTL_T(KC_ESC),  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, RCTL_T(KC_QUOT),
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RSFT_T(KC_ENT),
-    MO(_GUI), KC_LCTL, KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_RALT, KC_RCTL, MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD),
+    MO(_GUI), KC_LCTL, KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_RALT, KC_RCTL, MO(_GUI)
+),
 
 /* Lower
  * ,-----------------------------------------------------------------------------------.
@@ -74,14 +78,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |      |  F7  |  F8  |  F9  |  F10 |  F11 |  F12 |ISO ~ |ISO | | Home | End  |      |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      | Next | Vol- | Vol+ | Play |
+ * |      |      |      |      |      |             |      | Prev | Vol- | Vol+ | Play |
  * `-----------------------------------------------------------------------------------'
  */
 [_LOWER] = LAYOUT_planck_grid(
     KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR,    KC_ASTR,    KC_LPRN, KC_RPRN, KC_BSPC,
     KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_UNDS,    KC_PLUS,    KC_LCBR, KC_RCBR, KC_PIPE,
     _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  S(KC_NUHS), S(KC_NUBS), KC_HOME, KC_END,  _______,
-    _______, _______, _______, _______, _______, _______, _______, _______,    KC_MNXT,    KC_VOLD, KC_VOLU, KC_MPLY
+    _______, _______, _______, _______, _______, _______, _______, _______,    KC_MPRV,    KC_VOLD, KC_VOLU, KC_MPLY
 ),
 
 /* Raise
@@ -110,14 +114,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      |      |      |      |      |
+ * |      |CAP_S |CAP_P |COP_P |COP_P |             |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
 [_GUI] = LAYOUT_planck_grid(
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    _______, MAC_CAPTURE_SCREEN, MAC_CAPTURE_PORTION, MAC_COPY_SCREEN, MAC_COPY_PORTION, _______, _______, _______, _______, _______, _______, _______
 ),
 
 /* Plover layer (http://opensteno.org)
@@ -206,9 +210,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
-    case MAC_PARTIAL_SCREENSHOT_TO_CLIPBOARD:
+    case MAC_COPY_SCREEN:
+      if (record->event.pressed) {
+        SEND_STRING(SS_LGUI(SS_LCTL(SS_LSFT("3"))));
+      }
+      break;
+    case MAC_CAPTURE_SCREEN:
+      if (record->event.pressed) {
+        SEND_STRING(SS_LGUI(SS_LSFT("3")));
+      }
+      break;
+    case MAC_COPY_PORTION:
       if (record->event.pressed) {
         SEND_STRING(SS_LGUI(SS_LCTL(SS_LSFT("4"))));
+      }
+      break;
+    case MAC_CAPTURE_PORTION:
+      if (record->event.pressed) {
+        SEND_STRING(SS_LGUI(SS_LSFT("4")));
       }
       break;
   }
