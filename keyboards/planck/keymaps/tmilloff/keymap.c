@@ -17,16 +17,15 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case RSFT_T(KC_ENT):
-            return 10;
-        case LCTL_T(KC_ESC):
-            return 70;
+        case RCTL_T(KC_QUOT):
+            return true;
         default:
-            return TAPPING_TERM;
+            return false;
     }
 }
+
 
 enum planck_layers {
   _QWERTY,
