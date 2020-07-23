@@ -24,3 +24,5 @@
 
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE 5
+
+#define TAPPING_TERM 175
