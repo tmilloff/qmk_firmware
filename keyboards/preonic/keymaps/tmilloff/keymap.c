@@ -17,6 +17,15 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
+bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case RCTL_T(KC_QUOT):
+            return true;
+        default:
+            return false;
+    }
+}
+
 enum preonic_layers {
   _QWERTY,
   _LOWER,
